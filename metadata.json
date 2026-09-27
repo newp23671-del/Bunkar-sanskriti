@@ -1,0 +1,6 @@
+{
+  "name": "Bunkar Sanskriti - Banarasi Sarees & Luxury Fashion",
+  "description": "Authentic Banarasi silk sarees, suits, and designer materials from Varanasi. Tradition woven with grace with direct WhatsApp ordering and factory outlet.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

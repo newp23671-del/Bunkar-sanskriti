@@ -1,0 +1,137 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == 'newp23671@gmail.com' && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Entity Validation Helpers
+    function isValidProduct(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 200
+        && data.category is string && data.category.size() <= 100
+        && data.available is bool
+        && (!('price' in data) || data.price == null || (data.price is number && data.price >= 0))
+        && (!('salePrice' in data) || data.salePrice == null || (data.salePrice is number && data.salePrice >= 0))
+        && (!('description' in data) || (data.description is string && data.description.size() <= 5000))
+        && (!('shortDescription' in data) || (data.shortDescription is string && data.shortDescription.size() <= 500))
+        && (!('images' in data) || (data.images is list && data.images.size() <= 20))
+        && (!('tags' in data) || (data.tags is list && data.tags.size() <= 20));
+    }
+
+    function isValidCategory(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.slug is string && data.slug.size() <= 100
+        && data.enabled is bool
+        && (!('description' in data) || (data.description is string && data.description.size() <= 1000));
+    }
+
+    function isValidOrder(data) {
+      return data.reference is string && data.reference.size() <= 64
+        && data.customerName is string && data.customerName.size() > 0 && data.customerName.size() <= 150
+        && data.customerPhone is string && data.customerPhone.size() > 0 && data.customerPhone.size() <= 30
+        && data.customerAddress is string && data.customerAddress.size() > 0 && data.customerAddress.size() <= 500
+        && data.totalAmount is number && data.totalAmount >= 0
+        && data.items is list && data.items.size() > 0 && data.items.size() <= 50
+        && data.status in ['New', 'Contacted', 'Confirmed', 'Completed', 'Cancelled']
+        && (!('customerNote' in data) || (data.customerNote is string && data.customerNote.size() <= 1000));
+    }
+
+    function isValidEnquiry(data) {
+      return data.customerName is string && data.customerName.size() > 0 && data.customerName.size() <= 150
+        && data.customerPhone is string && data.customerPhone.size() > 0 && data.customerPhone.size() <= 30
+        && data.message is string && data.message.size() > 0 && data.message.size() <= 2000
+        && data.status in ['Pending', 'Responded', 'Closed'];
+    }
+
+    function isValidSettings(data) {
+      return data.businessName is string && data.businessName.size() > 0 && data.businessName.size() <= 100
+        && data.whatsappNumber is string && data.whatsappNumber.size() <= 30;
+    }
+
+    // Handshake test connection rule as required by Firebase skill
+    match /test/{docId} {
+      allow get: if true;
+    }
+
+    // Catalog & Products
+    match /products/{productId} {
+      allow get, list: if true;
+      allow create: if isValidId(productId) && isAdmin() && isValidProduct(incoming());
+      allow update: if isValidId(productId) && isAdmin() && isValidProduct(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'name', 'slug', 'category', 'price', 'salePrice', 'images', 
+          'available', 'featured', 'description', 'shortDescription', 
+          'tags', 'fabric', 'weave', 'color', 'zariType', 'isOutlet', 'variants', 'updatedAt'
+        ])
+      );
+      allow delete: if isValidId(productId) && isAdmin();
+    }
+
+    // Taxonomy & Categories
+    match /categories/{categoryId} {
+      allow get, list: if true;
+      allow create: if isValidId(categoryId) && isAdmin() && isValidCategory(incoming());
+      allow update: if isValidId(categoryId) && isAdmin() && isValidCategory(incoming());
+      allow delete: if isValidId(categoryId) && isAdmin();
+    }
+
+    // Customer Orders - Public create, Admin-only read and status update
+    match /orders/{orderId} {
+      allow get, list: if isAdmin();
+      allow create: if isValidId(orderId) && isValidOrder(incoming()) && incoming().status == 'New';
+      allow update: if isValidId(orderId) && isAdmin() && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNotes'])
+      );
+      allow delete: if isValidId(orderId) && isAdmin();
+    }
+
+    // Customer Enquiries - Public create, Admin-only read and status update
+    match /enquiries/{enquiryId} {
+      allow get, list: if isAdmin();
+      allow create: if isValidId(enquiryId) && isValidEnquiry(incoming()) && incoming().status == 'Pending';
+      allow update: if isValidId(enquiryId) && isAdmin() && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['status'])
+      );
+      allow delete: if isValidId(enquiryId) && isAdmin();
+    }
+
+    // Store Settings
+    match /settings/{settingsId} {
+      allow get, list: if true;
+      allow write: if isValidId(settingsId) && isAdmin() && isValidSettings(incoming());
+    }
+
+    // Administrator registry
+    match /admins/{adminId} {
+      allow get, list: if isAdmin();
+      allow write: if isValidId(adminId) && isAdmin();
+    }
+  }
+}

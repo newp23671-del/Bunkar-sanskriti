@@ -1,0 +1,366 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "Handcrafted Banarasi sarees, suits, and designer fabrics",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique product identifier",
+          "maxLength": 128
+        },
+        "name": {
+          "type": "string",
+          "description": "Product display name",
+          "maxLength": 200
+        },
+        "slug": {
+          "type": "string",
+          "description": "URL slug",
+          "maxLength": 200
+        },
+        "category": {
+          "type": "string",
+          "description": "Category name",
+          "maxLength": 100
+        },
+        "price": {
+          "type": "number",
+          "description": "Standard retail price in INR"
+        },
+        "salePrice": {
+          "type": "number",
+          "description": "Discounted sale price in INR"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed artisanal description",
+          "maxLength": 5000
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Brief summary",
+          "maxLength": 500
+        },
+        "images": {
+          "type": "array",
+          "description": "Array of product image URLs"
+        },
+        "available": {
+          "type": "boolean",
+          "description": "Availability status"
+        },
+        "featured": {
+          "type": "boolean",
+          "description": "Featured in highlight section"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Search and classification tags"
+        },
+        "fabric": {
+          "type": "string",
+          "description": "Silk or textile fabric type",
+          "maxLength": 100
+        },
+        "weave": {
+          "type": "string",
+          "description": "Banarasi weave technique",
+          "maxLength": 100
+        },
+        "isOutlet": {
+          "type": "boolean",
+          "description": "Part of factory outlet pricing"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["name", "category", "available", "createdAt", "updatedAt"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product category taxonomy",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Category ID",
+          "maxLength": 64
+        },
+        "name": {
+          "type": "string",
+          "description": "Category name",
+          "maxLength": 100
+        },
+        "slug": {
+          "type": "string",
+          "description": "URL slug",
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "description": "Category description",
+          "maxLength": 1000
+        },
+        "image": {
+          "type": "string",
+          "description": "Cover image URL",
+          "maxLength": 1000
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Visibility flag"
+        },
+        "displayOrder": {
+          "type": "number",
+          "description": "Sort order"
+        }
+      },
+      "required": ["name", "slug", "enabled"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer order record",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique order ID",
+          "maxLength": 128
+        },
+        "reference": {
+          "type": "string",
+          "description": "Order reference code (e.g., BS-123456)",
+          "maxLength": 64
+        },
+        "customerName": {
+          "type": "string",
+          "description": "Customer full name",
+          "maxLength": 150
+        },
+        "customerPhone": {
+          "type": "string",
+          "description": "Customer contact number",
+          "maxLength": 30
+        },
+        "customerEmail": {
+          "type": "string",
+          "description": "Optional customer email",
+          "maxLength": 150
+        },
+        "customerAddress": {
+          "type": "string",
+          "description": "Delivery address",
+          "maxLength": 500
+        },
+        "items": {
+          "type": "array",
+          "description": "Array of ordered products"
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Total order amount in INR"
+        },
+        "customerNote": {
+          "type": "string",
+          "description": "Customer remarks",
+          "maxLength": 1000
+        },
+        "status": {
+          "type": "string",
+          "description": "Order fulfillment status",
+          "enum": ["New", "Contacted", "Confirmed", "Completed", "Cancelled"]
+        },
+        "adminNotes": {
+          "type": "string",
+          "description": "Admin notes",
+          "maxLength": 1000
+        },
+        "viaWhatsApp": {
+          "type": "boolean",
+          "description": "Whether checkout initiated via WhatsApp"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Order creation timestamp"
+        }
+      },
+      "required": ["reference", "customerName", "customerPhone", "customerAddress", "totalAmount", "status", "createdAt"]
+    },
+    "Enquiry": {
+      "title": "Enquiry",
+      "description": "Customer product or bespoke enquiry",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Enquiry identifier",
+          "maxLength": 128
+        },
+        "customerName": {
+          "type": "string",
+          "description": "Customer name",
+          "maxLength": 150
+        },
+        "customerPhone": {
+          "type": "string",
+          "description": "Customer phone",
+          "maxLength": 30
+        },
+        "customerEmail": {
+          "type": "string",
+          "description": "Customer email",
+          "maxLength": 150
+        },
+        "productId": {
+          "type": "string",
+          "description": "Associated product ID",
+          "maxLength": 128
+        },
+        "productName": {
+          "type": "string",
+          "description": "Associated product title",
+          "maxLength": 200
+        },
+        "message": {
+          "type": "string",
+          "description": "Customer query message",
+          "maxLength": 2000
+        },
+        "status": {
+          "type": "string",
+          "description": "Enquiry status",
+          "enum": ["Pending", "Responded", "Closed"]
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Submission timestamp"
+        }
+      },
+      "required": ["customerName", "customerPhone", "message", "status", "createdAt"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Store configuration and operational schedule",
+      "type": "object",
+      "properties": {
+        "businessName": {
+          "type": "string",
+          "description": "Store branding name",
+          "maxLength": 100
+        },
+        "tagline": {
+          "type": "string",
+          "description": "Store tagline",
+          "maxLength": 200
+        },
+        "sonuPhone": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "shopPhone": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "amanPhone": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "address": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "googleMapsUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "instagramHandle": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "instagramUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "whatsappNumber": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "updatedAt": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      "required": ["businessName", "whatsappNumber"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Authorized administrator record for system access",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "Administrator email address",
+          "maxLength": 150
+        },
+        "role": {
+          "type": "string",
+          "description": "Role level",
+          "enum": ["admin", "superadmin"]
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Admin full name",
+          "maxLength": 150
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp created"
+        }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Catalog of Banarasi sarees, suits, and materials"
+    },
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Store categories and showcases"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Customer purchase orders and WhatsApp bookings"
+    },
+    "/enquiries/{enquiryId}": {
+      "schema": "Enquiry",
+      "description": "Customer enquiries and bespoke requests"
+    },
+    "/settings/{settingsId}": {
+      "schema": "Settings",
+      "description": "Store business hours and contact configuration"
+    },
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Authorized admin users for elevated dashboard access"
+    }
+  }
+}
